@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16
+    container_name: workout-scheduler-app
+    restart: always
+    environment:
+      POSTGRES_DB: workout-scheduler
+      POSTGRES_USER: zabieru
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5000:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - workout-scheduler-app-network
+
+volumes:
+  db-data:
+
+networks:
+  workout-scheduler-app-network:
