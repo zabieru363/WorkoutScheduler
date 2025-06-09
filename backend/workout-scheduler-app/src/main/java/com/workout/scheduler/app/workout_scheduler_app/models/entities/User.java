@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,15 +17,14 @@ import java.util.Set;
 @Table(name = "users")
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
     private Integer id;
     private String username;
     private String password;
     private String email;
 
-    /* @OneToOne(
+    @OneToOne(
             mappedBy = "user",
             cascade = { CascadeType.PERSIST, CascadeType.REMOVE },
             orphanRemoval = true)
@@ -38,10 +36,23 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roles = new HashSet<>(); */
+    private Set<Role> roles = new HashSet<>();
 
-    private Boolean active;
+    private Boolean enabled;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", profile=" + profile +
+                ", active=" + enabled +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }
