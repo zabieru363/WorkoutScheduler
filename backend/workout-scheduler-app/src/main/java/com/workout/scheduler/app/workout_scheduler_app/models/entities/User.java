@@ -20,8 +20,11 @@ public class User {
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
     private Integer id;
+
+    @Column(unique = true)
     private String username;
     private String password;
+    @Column(unique = true)
     private String email;
 
     @OneToOne(
