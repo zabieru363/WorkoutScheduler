@@ -1,5 +1,6 @@
 package com.workout.scheduler.app.workout_scheduler_app.exceptions;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
+/**
+ * Manejador de excepciones, springboot lo trata cómo un
+ * controlador así que hay que excluirlo de la documentación
+ * con @Hidden
+ */
+@Hidden
 @RestControllerAdvice
 public class ExceptionHandlerConfig {
 

@@ -2,6 +2,7 @@ package com.workout.scheduler.app.workout_scheduler_app.services.impl;
 
 import com.workout.scheduler.app.workout_scheduler_app.enums.EPersonType;
 import com.workout.scheduler.app.workout_scheduler_app.enums.ERole;
+import com.workout.scheduler.app.workout_scheduler_app.exceptions.GlobalException;
 import com.workout.scheduler.app.workout_scheduler_app.models.dtos.NewUserDTO;
 import com.workout.scheduler.app.workout_scheduler_app.models.entities.Profile;
 import com.workout.scheduler.app.workout_scheduler_app.models.entities.User;
@@ -10,6 +11,9 @@ import com.workout.scheduler.app.workout_scheduler_app.repositories.UserReposito
 import com.workout.scheduler.app.workout_scheduler_app.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -22,9 +26,26 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+
+    public boolean existsByUsernameOrEmail(String property, String value) {
+        return property.equals("username") ?
+                userRepository.existsByUsernameIgnoreCase(value) :
+                userRepository.existsByEmailIgnoreCase(value);
+    }
 
     @Override
     public String createUser(NewUserDTO data) {
+        if(existsByUsernameOrEmail("username", data.getUsername())) {
+            logger.error("Este nombre de usuario ya existe");
+            throw new GlobalException(HttpStatus.CONFLICT, "Este nombre de usuario ya existe");
+        }
+
+        if(existsByUsernameOrEmail("email", data.getEmail())) {
+            logger.error("Este email ya existe");
+            throw new GlobalException(HttpStatus.CONFLICT, "Este email ya existe");
+        }
+
         Profile profile = new Profile();
 
         profile.setName(data.getName());
