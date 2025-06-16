@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -16,10 +17,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**
  * Clase para configurar la seguridad de los endpoints
- * de la aplicación
+ * de la aplicación. Tiene habilitado @EnableMethodSecurity
+ * para poder usar @PreAuthorize en los controladores.
  */
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -71,8 +74,8 @@ public class SecurityConfig {
     /**
      * Bean que se encarga de autenticar a los usuarios.
      * @param authConfig
-     * @return
-     * @throws Exception
+     * @return El authentication manager
+     * @throws Exception Errores qu e se puedan producir
      */
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {

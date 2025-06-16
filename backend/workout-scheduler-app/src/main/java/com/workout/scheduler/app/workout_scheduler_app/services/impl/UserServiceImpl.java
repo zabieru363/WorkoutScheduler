@@ -4,10 +4,12 @@ import com.workout.scheduler.app.workout_scheduler_app.enums.EPersonType;
 import com.workout.scheduler.app.workout_scheduler_app.enums.ERole;
 import com.workout.scheduler.app.workout_scheduler_app.exceptions.GlobalException;
 import com.workout.scheduler.app.workout_scheduler_app.models.dtos.NewUserDTO;
+import com.workout.scheduler.app.workout_scheduler_app.models.dtos.UserDataDTO;
 import com.workout.scheduler.app.workout_scheduler_app.models.entities.Profile;
 import com.workout.scheduler.app.workout_scheduler_app.models.entities.User;
 import com.workout.scheduler.app.workout_scheduler_app.repositories.RoleRepository;
 import com.workout.scheduler.app.workout_scheduler_app.repositories.UserRepository;
+import com.workout.scheduler.app.workout_scheduler_app.security.SecurityContextHelper;
 import com.workout.scheduler.app.workout_scheduler_app.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -23,6 +26,7 @@ import java.util.Set;
 @Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+    private final SecurityContextHelper securityContextHelper;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -35,6 +39,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public String createUser(NewUserDTO data) {
         if(existsByUsernameOrEmail("username", data.getUsername())) {
             logger.error("Este nombre de usuario ya existe");
@@ -72,5 +77,15 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         return "Done";
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserDataDTO getUserData() {
+        return userRepository.getUserDataByUserId(securityContextHelper.getCurrentUserId())
+                .orElseThrow(() -> {
+                    logger.error("Usuario no encontrado");
+                    return new GlobalException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
+                });
     }
 }

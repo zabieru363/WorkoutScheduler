@@ -2,10 +2,7 @@ package com.workout.scheduler.app.workout_scheduler_app.models.entities;
 
 import com.workout.scheduler.app.workout_scheduler_app.enums.ERole;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,4 +24,13 @@ public class Role {
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "roles")
     private Set<User> users = new HashSet<>();
+
+    @Override
+    public String toString() {
+        return "Role{" +
+                "id=" + id +
+                ", name=" + name +
+                ", description='" + description + '\'' +
+                '}';
+    }
 }

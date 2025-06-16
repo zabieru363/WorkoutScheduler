@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Esta clase le dice a Spring Security donde están nuestros usuarios.
@@ -25,6 +26,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @throws UsernameNotFoundException Este error se lanzará cuando el
      * usuario no sea encontrado.
      */
+    @Transactional(readOnly = true)
     public UserDetails loadUserById(Long id) throws UsernameNotFoundException {
         User user = userRepository.findById(id.intValue())
                 .orElseThrow(() ->
@@ -41,8 +43,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * usuario no sea encontrado.
      */
     @Override
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String value) throws UsernameNotFoundException {
-        User user = userRepository.findByUsernameOrEmail(value, value)
+        User user = userRepository.findByUsernameOrEmailWithProfileAndRoles(value, value)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("Usuario no encontrado con username o email: " + value));
 

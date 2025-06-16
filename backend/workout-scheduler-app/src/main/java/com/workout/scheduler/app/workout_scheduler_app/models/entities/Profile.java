@@ -2,10 +2,7 @@ package com.workout.scheduler.app.workout_scheduler_app.models.entities;
 
 import com.workout.scheduler.app.workout_scheduler_app.enums.EPersonType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -39,4 +36,18 @@ public class Profile {
 
     private LocalDateTime birthdate;
 
+    @Override
+    public String toString() {
+        return "Profile{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", phone='" + phone + '\'' +
+                ", height=" + height +
+                ", weight=" + weight +
+                ", personType=" + personType +
+                ", trainings=" + trainings +
+                ", birthdate=" + birthdate +
+                '}';
+    }
 }

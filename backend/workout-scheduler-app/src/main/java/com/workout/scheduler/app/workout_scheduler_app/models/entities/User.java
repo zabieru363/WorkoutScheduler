@@ -1,10 +1,7 @@
 package com.workout.scheduler.app.workout_scheduler_app.models.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -33,7 +30,7 @@ public class User {
             orphanRemoval = true)
     private Profile profile;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -51,10 +48,8 @@ public class User {
         return "User{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
-                ", profile=" + profile +
-                ", active=" + enabled +
+                ", enabled=" + enabled +
                 ", createdAt=" + createdAt +
                 '}';
     }
