@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UserService {
     boolean existsByUsernameOrEmail(String property, String value);
-    String createUser(NewUserDTO data);
+    String preRegister(NewUserDTO data);
+    String registerConfirmation(int userId, String attempt);
+    String resendConfirmationCode(int userId);
     UserDataDTO getUserData();
 }

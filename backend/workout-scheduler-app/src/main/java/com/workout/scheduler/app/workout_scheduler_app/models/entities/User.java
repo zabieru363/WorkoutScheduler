@@ -38,6 +38,13 @@ public class User {
     )
     private Set<Role> roles = new HashSet<>();
 
+    @OneToMany(
+            fetch = FetchType.LAZY,
+            cascade = { CascadeType.PERSIST, CascadeType.REMOVE },
+            orphanRemoval = true,
+            mappedBy = "user")
+    private Set<ConfirmationCode> codes = new HashSet<>();
+
     private Boolean enabled;
 
     @Column(name = "created_at")

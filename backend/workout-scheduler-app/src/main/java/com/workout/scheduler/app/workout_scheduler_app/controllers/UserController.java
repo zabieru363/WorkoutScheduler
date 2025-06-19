@@ -25,16 +25,16 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping(value = "/register")
+    @PostMapping(value = "/pre-register")
     @Operation(
-            summary = "Crear usuario",
+            summary = "Pre-registro",
             description = "Crea un nuevo usuario con el ROLE_USER y los datos para " +
-                    "su perfil correspondiente"
+                    "su perfil correspondiente y deja el usuario sin confirmar (enabled = false)"
     )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "201",
-                    description = "Usuario creado con éxito",
+                    description = "Done",
                     content = @Content(mediaType = "text/plain",
                             schema = @Schema(implementation = String.class))
             ),
@@ -43,7 +43,8 @@ public class UserController {
                     description = "Este nombre de usuario ya existe",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class))
-            ),@ApiResponse(
+            ),
+            @ApiResponse(
                     responseCode = "409",
                     description = "Este email ya existe",
                     content = @Content(mediaType = "application/json",
@@ -56,8 +57,80 @@ public class UserController {
                             schema = @Schema(implementation = ErrorResponse.class))
             )
     })
-    public ResponseEntity<String> createUser(@Valid @RequestBody NewUserDTO data) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(data));
+    public ResponseEntity<String> preRegister(@Valid @RequestBody NewUserDTO data) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.preRegister(data));
+    }
+
+    @PatchMapping(value = "/{userId}/register-confirmation")
+    @Operation(
+            summary = "Confirmación de registro",
+            description = "Activa un usuario si el código coincide con el que envió el usuario y " +
+                    "si este no ha expirado. El usuario debe de existir para poder confirmarlo."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Registration completed",
+                    content = @Content(mediaType = "text/plain",
+                            schema = @Schema(implementation = String.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuario no encontrado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Lo que recibió el servicio no es un código",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            )
+    })
+    public ResponseEntity<String> registerConfirmation(@PathVariable Integer userId, @RequestParam String attempt) {
+        return ResponseEntity.ok(userService.registerConfirmation(userId, attempt));
+    }
+
+    @PatchMapping(value = "/{userId}/resend-confirmation-code")
+    @Operation(
+            summary = "Reenvío de código de confirmación",
+            description = "Crea un nuevo código de confirmación y se lo manda al usuario. Elimina " +
+                    "los que ya tenía anteriormente."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "New confirmation code has been created",
+                    content = @Content(mediaType = "text/plain",
+                            schema = @Schema(implementation = String.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuario no encontrado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Algo salió mal al enviar el correo.",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            )
+    })
+    public ResponseEntity<String> resendConfirmationCode(@PathVariable Integer userId) {
+        return ResponseEntity.ok(userService.resendConfirmationCode(userId));
     }
 
     @GetMapping

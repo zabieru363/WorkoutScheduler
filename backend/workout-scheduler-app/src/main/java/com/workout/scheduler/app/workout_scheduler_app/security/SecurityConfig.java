@@ -62,7 +62,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/users/register").permitAll()
+                        .requestMatchers("/users/pre-register").permitAll()
+                        .requestMatchers("/users/{userId}/register-confirmation").permitAll()
+                        .requestMatchers("/users/{userId}/resend-confirmation-code").permitAll()
                         .requestMatchers(SWAGGER_PATHS).permitAll()
                         .anyRequest().authenticated()
                 )
