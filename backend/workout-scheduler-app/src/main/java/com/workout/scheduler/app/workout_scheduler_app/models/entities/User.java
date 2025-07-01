@@ -2,6 +2,7 @@ package com.workout.scheduler.app.workout_scheduler_app.models.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,7 +31,7 @@ public class User {
             orphanRemoval = true)
     private Profile profile;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -45,10 +46,18 @@ public class User {
             mappedBy = "user")
     private Set<ConfirmationCode> codes = new HashSet<>();
 
-    private Boolean enabled;
+    @OneToMany(
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true,
+            mappedBy = "user")
+    private Set<Routine> routines = new HashSet<>();
 
+    @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    private Boolean enabled;
 
     @Override
     public String toString() {
