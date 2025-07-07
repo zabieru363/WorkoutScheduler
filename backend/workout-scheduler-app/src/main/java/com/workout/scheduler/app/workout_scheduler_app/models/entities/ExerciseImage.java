@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "exercises_image")
+@Table(name = "exercises_images")
 public class ExerciseImage {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,13 +22,11 @@ public class ExerciseImage {
     private String url;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "exercise_resource_id")
-    private ExerciseResource exerciseResource;
+    @JoinColumn(name = "exercise_id")
+    private Exercise exercise;
 
     @CreationTimestamp
     @Column(name = "added_at")
     private LocalDateTime addedAt;
-
-    private Boolean enabled;
 
 }

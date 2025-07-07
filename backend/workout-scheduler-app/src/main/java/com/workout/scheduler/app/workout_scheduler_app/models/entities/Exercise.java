@@ -6,10 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,17 +20,23 @@ public class Exercise {
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
     private String name;
+    @Column(name = "main_muscle", nullable = false)
     private String mainMuscle;
+    @Column(name = "secondary_muscle")
     private String secondaryMuscle;
     private String description;
+    @Column(name = "require_equipment")
     private Boolean requireEquipment;
 
     @OneToMany(
             fetch = FetchType.LAZY,
+            mappedBy = "exercise",
             cascade = { CascadeType.PERSIST, CascadeType.REMOVE },
-            orphanRemoval = true,
-            mappedBy = "exercise")
-    private Set<ExerciseResource> exerciseResources = new HashSet<>();
+            orphanRemoval = true)
+    private List<ExerciseImage> images = new ArrayList<>();
+
+    @Column(name = "video_url")
+    private String videoURL;
 
     @CreationTimestamp
     @Column(name = "added_at")
@@ -40,7 +45,7 @@ public class Exercise {
     @Column(name = "is_custom")
     private Boolean isCustom;
 
-    private Boolean enabled;
+    private Boolean enabled = true;
 
     @Override
     public String toString() {
