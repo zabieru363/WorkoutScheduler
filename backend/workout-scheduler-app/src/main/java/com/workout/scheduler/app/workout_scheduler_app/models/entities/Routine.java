@@ -1,6 +1,17 @@
 package com.workout.scheduler.app.workout_scheduler_app.models.entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,14 +34,7 @@ public class Routine {
 
     @OneToMany(
             fetch = FetchType.LAZY,
-            cascade = { CascadeType.PERSIST, CascadeType.REMOVE },
-            orphanRemoval = true,
-            mappedBy = "routine")
-    private Set<RoutineDay> makeOn = new HashSet<>();
-
-    @OneToMany(
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.REMOVE,
+            cascade = CascadeType.ALL,
             orphanRemoval = true,
             mappedBy = "routine")
     private Set<RoutineEntry> exercises = new HashSet<>();
@@ -53,5 +57,10 @@ public class Routine {
                 ", enabled=" + enabled +
                 ", createdAt=" + createdAt +
                 '}';
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (this.enabled == null) this.enabled = true;
     }
 }

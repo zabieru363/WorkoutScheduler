@@ -56,16 +56,16 @@ public class UserServiceImpl implements UserService {
     }
 
     private Profile createUserData(NewUserDTO data) {
-        Profile profile = new Profile();
+        var profile = new Profile();
 
-        profile.setName(data.getName());
-        profile.setLastname(data.getLastname());
-        profile.setPhone(data.getPhone());
-        profile.setHeight(data.getHeight());
-        profile.setWeight(data.getWeight());
-        profile.setPersonType(EPersonType.valueOf(data.getPersonType()));
-        profile.setBirthdate(data.getBirthdate());
-        profile.setTrainings(data.getTrainings());
+        profile.setName(data.name());
+        profile.setLastname(data.lastname());
+        profile.setPhone(data.phone());
+        profile.setHeight(data.height());
+        profile.setWeight(data.weight());
+        profile.setPersonType(EPersonType.valueOf(data.personType()));
+        profile.setBirthdate(data.birthdate());
+        profile.setTrainings(data.trainings());
 
         return profile;
     }
@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
     private ConfirmationCode createNewConfirmationCode(User user) {
         ConfirmationCode confirmationCode = new ConfirmationCode();
 
-        Random random = new Random();
+        var random = new Random();
         int code = random.nextInt(10000, 99999);
 
         confirmationCode.setCode(code);
@@ -85,24 +85,38 @@ public class UserServiceImpl implements UserService {
         return confirmationCode;
     }
 
+    @Override
+    public boolean existsById(int id) {
+        return userRepository.existsByIdAndEnabledTrue(id);
+    }
+
+    @Override
+    public User getUserById(int id) {
+        return userRepository.findByIdAndEnabledTrue(id)
+                .orElseThrow(() -> {
+                    logger.error("Usuario no encontrado");
+                    return new GlobalException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
+                });
+    }
+
+    @Override
     public boolean existsByUsernameOrEmail(String property, String value) {
         return property.equals("username") ?
                 userRepository.existsByUsernameIgnoreCase(value) :
                 userRepository.existsByEmailIgnoreCase(value);
     }
 
-
     @Override
     @Transactional
     public String preRegister(NewUserDTO data) {
-        validateUsernameAndEmail(data.getUsername(), data.getEmail());
+        validateUsernameAndEmail(data.username(), data.email());
 
         Profile profile = createUserData(data);
         User user = new User();
 
-        user.setUsername(data.getUsername());
-        user.setPassword(passwordEncoder.encode(data.getPassword()));
-        user.setEmail(data.getEmail());
+        user.setUsername(data.username());
+        user.setPassword(passwordEncoder.encode(data.password()));
+        user.setEmail(data.email());
         user.setProfile(profile);
         user.setEnabled(false);
         user.setCreatedAt(LocalDateTime.now());
@@ -129,7 +143,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
-        return "Done";
+        return "Pre-registro completado.";
     }
 
     @Override
@@ -159,7 +173,7 @@ public class UserServiceImpl implements UserService {
         userRepository.setUserAsActive(userId);
         confirmationCodeRepository.updateUserConfirmationCode(EConfirmationCodeStatus.USED, userId);
 
-        return "Registration completed";
+        return "Registro completado.";
     }
 
     @Override
@@ -175,7 +189,7 @@ public class UserServiceImpl implements UserService {
 
         ConfirmationCode confirmationCode = new ConfirmationCode();
 
-        Random random = new Random();
+        var random = new Random();
         int code = random.nextInt(10000, 99999);
 
         confirmationCode.setCode(code);
@@ -200,7 +214,7 @@ public class UserServiceImpl implements UserService {
 
         confirmationCodeRepository.save(confirmationCode);
 
-        return "New confirmation code has been created";
+        return "Nuevo código de confirmación enviado correctamente";
     }
 
     @Override

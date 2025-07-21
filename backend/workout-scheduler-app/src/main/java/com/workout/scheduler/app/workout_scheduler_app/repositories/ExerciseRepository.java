@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface ExerciseRepository extends JpaRepository<Exercise, Integer> {
@@ -16,6 +17,8 @@ public interface ExerciseRepository extends JpaRepository<Exercise, Integer> {
             "AND e.enabled = true " +
             "ORDER BY e.name")
     List<Exercise> findExercisesByName(String name);
+
+    Set<Exercise> findByIdInAndEnabledTrue(Set<Integer> ids);
 
     @Query(value = "SELECT e FROM Exercise e " +
             "LEFT JOIN FETCH e.images " +

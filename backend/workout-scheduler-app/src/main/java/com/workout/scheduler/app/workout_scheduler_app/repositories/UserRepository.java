@@ -12,10 +12,12 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByIdAndEnabledFalse(int id);
+    Optional<User> findByIdAndEnabledTrue(int id);
 
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.profile " +
             "LEFT JOIN FETCH u.roles WHERE u.username = :username OR u.email = :email")
     Optional<User> findByUsernameOrEmailWithProfileAndRoles(@Param("username") String username, @Param("email") String email);
+    boolean existsByIdAndEnabledTrue(int id);
     boolean existsByUsernameIgnoreCase(String username);
     boolean existsByEmailIgnoreCase(String email);
     boolean existsByIdAndEnabledFalse(int id);
@@ -26,10 +28,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query(value = "SELECT new com.workout.scheduler.app.workout_scheduler_app" +
             ".models.dtos.UserDataDTO(" +
-            "u.id, u.username, u.email, u.enabled, u.createdAt," +
+            "u.id, u.username, u.email, u.createdAt," +
             "p.name, p.lastname, p.phone, p.height, p.weight," +
             "p.personType, p.trainings, p.birthdate) " +
             "FROM User u LEFT JOIN u.profile p " +
-            "WHERE u.id = ?1")
+            "WHERE u.id = ?1 AND u.enabled = true")
     Optional<UserDataDTO> getUserDataByUserId(int id);
 }

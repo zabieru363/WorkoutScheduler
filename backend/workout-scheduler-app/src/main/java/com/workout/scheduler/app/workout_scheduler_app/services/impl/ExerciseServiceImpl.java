@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -27,6 +28,24 @@ public class ExerciseServiceImpl implements ExerciseService {
     private final ExerciseRepository exerciseRepository;
     private final ExerciseMapper exerciseMapper;
     private final FileStorageService fileStorageService;
+
+    @Override
+    public void save(Exercise exercise) {
+        exerciseRepository.save(exercise);
+    }
+
+    @Override
+    public Exercise findExerciseById(int id) {
+        return exerciseRepository.getExerciseById(id).orElseThrow(() -> {
+            log.error("Exercise with id {} not found", id);
+            return new GlobalException(HttpStatus.NOT_FOUND, "No se encontró el ejercicio con id: " + id);
+        });
+    }
+
+    @Override
+    public Set<Exercise> findExercisesByIds(Set<Integer> ids) {
+        return exerciseRepository.findByIdInAndEnabledTrue(ids);
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -58,12 +77,12 @@ public class ExerciseServiceImpl implements ExerciseService {
 
         if(isUpdate) return dto;
 
-        if(dto.getName().isEmpty()) {
+        if(dto.name().isEmpty()) {
             log.error("Exercise name is empty");
             throw new GlobalException(HttpStatus.BAD_REQUEST, "El nombre del ejercicio no puede estar vacío");
         }
 
-        if(dto.getMainMuscle().isEmpty()) {
+        if(dto.mainMuscle().isEmpty()) {
             log.error("Exercise mainMuscle is empty");
             throw new GlobalException(HttpStatus.BAD_REQUEST, "El ejercicio debe de tener un músculo principal");
         }
@@ -113,12 +132,12 @@ public class ExerciseServiceImpl implements ExerciseService {
             return new GlobalException(HttpStatus.NOT_FOUND, "No se encontró el ejercicio con id: " + id);
         });
 
-        if(dto.getName() != null) exercise.setName(dto.getName());
-        if(dto.getDescription() != null) exercise.setDescription(dto.getDescription());
-        if(dto.getMainMuscle() != null) exercise.setMainMuscle(dto.getMainMuscle());
-        if(dto.getSecondaryMuscle() != null) exercise.setSecondaryMuscle(dto.getSecondaryMuscle());
-        if(dto.getRequireEquipment() != null) exercise.setRequireEquipment(dto.getRequireEquipment());
-        if(dto.getVideoURL() != null) exercise.setVideoURL(dto.getVideoURL());
+        if(dto.name() != null) exercise.setName(dto.name());
+        if(dto.description() != null) exercise.setDescription(dto.description());
+        if(dto.mainMuscle() != null) exercise.setMainMuscle(dto.mainMuscle());
+        if(dto.secondaryMuscle() != null) exercise.setSecondaryMuscle(dto.secondaryMuscle());
+        if(dto.requireEquipment() != null) exercise.setRequireEquipment(dto.requireEquipment());
+        if(dto.videoURL() != null) exercise.setVideoURL(dto.videoURL());
         if(!imagesRequest.isEmpty()) exercise.setImages(createExerciseImagesList(exercise, imagesRequest));
 
         exerciseRepository.save(exercise);

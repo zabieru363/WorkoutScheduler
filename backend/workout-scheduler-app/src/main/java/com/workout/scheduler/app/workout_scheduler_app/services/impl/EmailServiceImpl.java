@@ -36,11 +36,11 @@ public class EmailServiceImpl implements EmailService {
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(message, true, "UTF-8");
 
-        mimeMessageHelper.setTo(data.getTo().toLowerCase());
-        mimeMessageHelper.setSubject(data.getSubject());
+        mimeMessageHelper.setTo(data.to().toLowerCase());
+        mimeMessageHelper.setSubject(data.subject());
 
         Context thymeleafContext = new Context();
-        thymeleafContext.setVariable("message", data.getMessage());
+        thymeleafContext.setVariable("message", data.message());
         String html = templateEngine.process(templateName, thymeleafContext);
         mimeMessageHelper.setText(html, true);
 
@@ -49,15 +49,15 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendConfirmationCodeEmail(NewEmailDTO data) throws MessagingException {
-        String text = data.getMessage()
-                .replace("{username}", String.valueOf(data.getParams().get("username")))
-                .replace("{code}", String.valueOf(data.getParams().get("code")));
+        String text = data.message()
+                .replace("{username}", String.valueOf(data.params().get("username")))
+                .replace("{code}", String.valueOf(data.params().get("code")));
 
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(message, true, "UTF-8");
 
-        mimeMessageHelper.setTo(data.getTo().toLowerCase());
-        mimeMessageHelper.setSubject(data.getSubject());
+        mimeMessageHelper.setTo(data.to().toLowerCase());
+        mimeMessageHelper.setSubject(data.subject());
 
         Context thymeleafContext = new Context();
         thymeleafContext.setVariable("message", text);
