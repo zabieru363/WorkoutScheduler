@@ -46,7 +46,7 @@ public class RoutineServiceImpl implements RoutineService {
         return routineRepository.findByIdAndEnabledTrue(id)
                 .orElseThrow(() -> {
                     logger.error("Rutina con id {} no encontrada", id);
-                    return new GlobalException(HttpStatus.NOT_FOUND, "Rutina con id " + id + " no encontrada");
+                    return new GlobalException(HttpStatus.NOT_FOUND, "Rutina no encontrada");
                 });
     }
 

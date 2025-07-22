@@ -39,6 +39,13 @@ public class Routine {
             mappedBy = "routine")
     private Set<RoutineEntry> exercises = new HashSet<>();
 
+    @OneToMany(
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true,
+            mappedBy = "routine")
+    private Set<RoutineRating> ratings = new HashSet<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private User user;
