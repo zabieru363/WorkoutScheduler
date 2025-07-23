@@ -5,10 +5,11 @@ VALUES
 
 INSERT INTO users (id, username, password, email, enabled, created_at)
 VALUES
-(1, 'zabieru363', '$2a$10$xgGhRIifHjcQN66omn1llO6fNnGb5vnMq904hlySJRk2qzuJaCgbO', 'zabierujlc@gmail.com', true, CURRENT_DATE);
+(1, 'zabieru363', '$2a$10$xgGhRIifHjcQN66omn1llO6fNnGb5vnMq904hlySJRk2qzuJaCgbO', 'zabierujlc@gmail.com', true, CURRENT_DATE),
+(2, 'prueba', '$2a$10$xgGhRIifHjcQN66omn1llO6fNnGb5vnMq904hlySJRk2qzuJaCgbO', 'zabierujlc2@gmail.com', true, CURRENT_DATE);
 
 INSERT INTO users_roles (user_id, role_id)
-VALUES (1, 1), (1, 2);
+VALUES (1, 1), (1, 2), (2, 1), (2, 2);
 
 INSERT INTO exercises (id, name, main_muscle, description, require_equipment, added_at, enabled)
 VALUES

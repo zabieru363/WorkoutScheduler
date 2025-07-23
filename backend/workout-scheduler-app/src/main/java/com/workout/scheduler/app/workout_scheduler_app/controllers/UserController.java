@@ -2,9 +2,12 @@ package com.workout.scheduler.app.workout_scheduler_app.controllers;
 
 import com.workout.scheduler.app.workout_scheduler_app.exceptions.ErrorResponse;
 import com.workout.scheduler.app.workout_scheduler_app.models.dtos.NewUserDTO;
+import com.workout.scheduler.app.workout_scheduler_app.models.dtos.RoutineDTO;
 import com.workout.scheduler.app.workout_scheduler_app.models.dtos.UserDataDTO;
+import com.workout.scheduler.app.workout_scheduler_app.services.SavedRoutineService;
 import com.workout.scheduler.app.workout_scheduler_app.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import java.util.Set;
 
 @RestController
 @RequestMapping(value = "/users")
@@ -24,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final SavedRoutineService savedRoutineService;
 
     @PostMapping(value = "/pre-register")
     @Operation(
@@ -34,7 +39,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "201",
-                    description = "Done",
+                    description = "Pre-registro completado",
                     content = @Content(mediaType = "text/plain",
                             schema = @Schema(implementation = String.class))
             ),
@@ -70,7 +75,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Registration completed",
+                    description = "Registro completado",
                     content = @Content(mediaType = "text/plain",
                             schema = @Schema(implementation = String.class))
             ),
@@ -106,7 +111,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "New confirmation code has been created",
+                    description = "Nuevo código de confirmación enviado correctamente",
                     content = @Content(mediaType = "text/plain",
                             schema = @Schema(implementation = String.class))
             ),
@@ -165,4 +170,155 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserData());
     }
 
+    // ! A estos endpoints no se les pasa el userId ya que los guardados son privados para cada usuario
+
+    @GetMapping(value = "/saved-routines")
+    @PreAuthorize("hasRole('USER')")
+    @Operation(
+            summary = "Obtener rutinas de una lista de un usuario",
+            description = "Devuelve una lista de rutinas de una de las listas del usuario con la sesión iniciada. " +
+                    "Se pueden obtener las rutinas guardadas, las favoritas o las creadas especificando el parámetro listType"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "OK",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = RoutineDTO.class)))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuario no encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Lista no encontrada",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            )
+    })
+    public ResponseEntity<Set<RoutineDTO>> getAllSavedRoutinesOfUser(@RequestParam String listType) {
+        return ResponseEntity.ok(savedRoutineService.getAllRoutinesOfList(listType));
+    }
+
+    @PostMapping(value = "/saved-routines/{routineId}")
+    @PreAuthorize("hasRole('USER')")
+    @Operation(
+            summary = "Guardar rutina en una lista del usuario",
+            description = "Guarda una rutina para el usuario con la sesión iniciada en uan de sus " +
+                    "listas de rutinas. Se puede especificar la lista que se quiere con el " +
+                    "parámetro listType. Si ya la tiene guardada o si trata de " +
+                    "guardar su propia rutina, lanzará una excepción."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Rutina guardada correctamente para el usuario con ID {userId}",
+                    content = @Content(mediaType = "text/plain",
+                            schema = @Schema(implementation = String.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuario no encontrado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Rutina no encontrada",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Lista no encontrada",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "El usuario ya tiene esta rutina guardada",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Un usuario no puede guardar su propia rutina",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            )
+    })
+    public ResponseEntity<String> saveRoutine(@PathVariable int routineId, @RequestBody String listType) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedRoutineService.saveRoutineInList(routineId, listType));
+    }
+
+    @DeleteMapping(value = "/saved-routines/{routineId}")
+    @PreAuthorize("hasRole('USER')")
+    @Operation(
+            summary = "Eliminar rutina de lista de usuario",
+            description = "Quita una rutina de una de la lista de rutinas del usuario con la sesión iniciada. " +
+                    "Se puede especificar la lista que se quiere con el parámetro listType. " +
+                    "Si no la tiene guardada lanzará una excepción."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Rutina eliminada correctamente para el usuario con ID {userId}",
+                    content = @Content(mediaType = "text/plain",
+                            schema = @Schema(implementation = String.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuario no encontrado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Rutina no encontrada",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Lista no encontrada",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "El usuario no tiene esta rutina guardada",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            )
+    })
+    public ResponseEntity<String> unsaveRoutine(@PathVariable int routineId, @RequestBody String listType) {
+        return ResponseEntity.ok(savedRoutineService.unsaveRoutineInList(routineId, listType));
+    }
 }

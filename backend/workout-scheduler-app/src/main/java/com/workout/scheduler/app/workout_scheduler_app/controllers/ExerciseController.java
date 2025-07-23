@@ -45,7 +45,7 @@ public class ExerciseController {
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Error interno del servidor",
+                    description = "Internal Server Error",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class)
