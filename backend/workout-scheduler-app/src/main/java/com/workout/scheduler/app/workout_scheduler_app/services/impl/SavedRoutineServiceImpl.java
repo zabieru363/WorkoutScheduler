@@ -101,14 +101,14 @@ public class SavedRoutineServiceImpl implements SavedRoutineService {
 
         Set<SavedRoutine> savedRoutines = user.getSavedRoutines();
 
-        if(isLoggedUserEqualsThanRoutineCreator(currentUserId, routine.getUser().getId())) {
+        if(type.equals(ERoutineListType.SAVED) && isLoggedUserEqualsThanRoutineCreator(currentUserId, routine.getUser().getId())) {
             logger.error("El usuario con ID {} no puede guardar su propia rutina con ID {}", currentUserId, routineId);
             throw new GlobalException(HttpStatus.CONFLICT, "Un usuario no puede guardar su propia rutina");
         }
 
         if(isRoutineAlreadySavedByUser(routineId, savedRoutines, type)) {
-            logger.error("La rutina con ID {} ya está guardada para el usuario con ID {}", routineId, currentUserId);
-            throw new GlobalException(HttpStatus.CONFLICT, "Esta rutina ya está guardada para este usuario");
+            logger.error("La rutina con ID {} ya está guardada para el usuario con ID {} en esta lista", routineId, currentUserId);
+            throw new GlobalException(HttpStatus.CONFLICT, "Esta rutina ya está guardada para este usuario en esta lista");
         }
 
         savedRoutines.add(createSavedRoutineEntity(type, routine, user));
