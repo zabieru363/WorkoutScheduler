@@ -11,8 +11,10 @@ VALUES
 INSERT INTO users_roles (user_id, role_id)
 VALUES (1, 1), (1, 2), (2, 1), (2, 2);
 
-INSERT INTO exercises (id, name, main_muscle, description, require_equipment, added_at, enabled)
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO pg_database_owner;
+
+INSERT INTO exercises (id, name, main_muscle, secondary_muscle, description, require_equipment, added_at, enabled)
 VALUES
-(1, 'Push Up', 'Chest', 'A basic exercise for upper body strength.', false, CURRENT_DATE, true),
-(2, 'Squat', 'Legs', 'A fundamental exercise for lower body strength.', false, CURRENT_DATE, true),
-(3, 'Deadlift', 'Back', 'A compound exercise for overall strength.', true, CURRENT_DATE, true);
+(1, 'Push Up', 'Chest', null, 'A basic exercise for upper body strength.', false, CURRENT_DATE, true),
+(2, 'Squat', 'Legs', null, 'A fundamental exercise for lower body strength.', false, CURRENT_DATE, true),
+(3, 'Deadlift', 'Back', 'Chest', 'A compound exercise for overall strength.', true, CURRENT_DATE, true);

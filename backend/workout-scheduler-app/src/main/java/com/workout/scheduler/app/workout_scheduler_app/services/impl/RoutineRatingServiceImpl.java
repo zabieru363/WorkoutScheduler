@@ -64,7 +64,7 @@ public class RoutineRatingServiceImpl implements RoutineRatingService {
         rating.setRoutine(routine);
         rating.setCreatedBy(securityContextHelper.getCurrentUserId());
 
-        routineRatingRepository.save(rating);
+        save(rating);
 
         return "Valoración creada correctamente";
     }

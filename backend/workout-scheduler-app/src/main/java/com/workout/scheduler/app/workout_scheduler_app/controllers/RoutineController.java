@@ -1,9 +1,9 @@
 package com.workout.scheduler.app.workout_scheduler_app.controllers;
 
 import com.workout.scheduler.app.workout_scheduler_app.exceptions.ErrorResponse;
-import com.workout.scheduler.app.workout_scheduler_app.models.dtos.ExerciseDTO;
 import com.workout.scheduler.app.workout_scheduler_app.models.dtos.NewRoutineDTO;
 import com.workout.scheduler.app.workout_scheduler_app.models.dtos.RoutineDTO;
+import com.workout.scheduler.app.workout_scheduler_app.models.dtos.RoutineFiltersDTO;
 import com.workout.scheduler.app.workout_scheduler_app.services.RoutineService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -34,6 +34,41 @@ import java.util.Set;
 public class RoutineController {
 
     private final RoutineService routineService;
+
+    @PostMapping(value = "/list")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @Operation(
+            summary = "Listado de rutinas con filtros",
+            description = "Devuelve las rutinas que coinciden con los filtros proporcionados. Si " +
+            "no hay ninguna rutina que coincida con los filtros devolverá una lista vacía."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "OK",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = RoutineDTO.class)))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "El filtro between requiere dos fechas",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Error interno del servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))
+            )
+    })
+    public ResponseEntity<Set<RoutineDTO>> getRoutinesByFilters(
+            @RequestBody RoutineFiltersDTO filters) {
+        return ResponseEntity.ok(routineService.searchRoutinesByFilters(filters));
+    }
 
     @GetMapping(value = "/user/{userId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
