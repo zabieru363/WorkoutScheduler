@@ -13,6 +13,26 @@ También los usuarios pueden dejar valoraciones de las rutinas y dar me gusta, g
 ### Estado del proyecto
 Todavía en desarrollo
 
+### Tecnologias usadas:
+- Java
+- Typescript
+- SpringBoot
+- Angular
+- PostgreSQL
+
+### Librerías, módulos y recursos utilizados
+- Spring Data JPA
+- Spring Security
+- Lombok
+- Spring Validator
+- JWT
+- JavaMailSender
+- Map Struct
+- Swagger
+
+### Documentación de la API (en local)
+http://localhost:8080/ws/api/v1/swagger-ui/index.html
+
 ### Requisitos para ejecutar el proyecto en local:
 - Bajate la rama develop del repositorio y haz una copia en tu máquina (ahí se van publicando los últimos cambios)
 - JDK 17 o superior (recomendado JDK 17)
